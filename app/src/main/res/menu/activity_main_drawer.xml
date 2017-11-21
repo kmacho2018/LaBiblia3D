@@ -1,0 +1,280 @@
+<?xml version="1.0" encoding="utf-8"?>
+<menu xmlns:android="http://schemas.android.com/apk/res/android">
+
+    <item android:title="Antiguo Testamento">
+        <menu>
+            <item
+                android:id="@+id/nav_Génesis"
+                android:icon="@drawable/ic_pageview_enable"
+                android:title="Génesis" />
+            <item
+                android:id="@+id/nav_Exodo"
+                android:icon="@drawable/ic_pageview_enable"
+                android:title="Éxodo" />
+            <item
+                android:id="@+id/nav_Levítico"
+                android:icon="@drawable/ic_pageview_enable"
+                android:title="Levítico" />
+            <item
+                android:id="@+id/nav_Números"
+                android:icon="@drawable/ic_pageview_enable"
+                android:title="Números" />
+            <item
+                android:id="@+id/nav_Deuteronomio"
+                android:icon="@drawable/ic_pageview_enable"
+                android:title="Deuteronomio" />
+            <item
+                android:id="@+id/nav_Josué"
+                android:icon="@drawable/ic_pageview_enable"
+                android:title="Josué" />
+            <item
+                android:id="@+id/nav_Jueces"
+                android:icon="@drawable/ic_pageview_enable"
+                android:title="Jueces" />
+            <item
+                android:id="@+id/nav_Rut"
+                android:icon="@drawable/ic_pageview_enable"
+                android:title="Rut" />
+            <item
+                android:id="@+id/nav_1Samuel"
+                android:icon="@drawable/ic_pageview_enable"
+                android:title="1 Samuel" />
+            <item
+                android:id="@+id/nav_2Samuel"
+                android:icon="@drawable/ic_pageview_enable"
+                android:title="2 Samuel" />
+            <item
+                android:id="@+id/nav_1Reyes"
+                android:icon="@drawable/ic_pageview_enable"
+                android:title="1 Reyes" />
+            <item
+                android:id="@+id/nav_2Reyes"
+                android:icon="@drawable/ic_pageview_enable"
+                android:title="2 Reyes" />
+            <item
+                android:id="@+id/nav_1Crónicas"
+                android:icon="@drawable/ic_pageview_enable"
+                android:title="1 Crónicas" />
+            <item
+                android:id="@+id/nav_2Crónicas"
+                android:icon="@drawable/ic_pageview_enable"
+                android:title="2 Crónicas" />
+            <item
+                android:id="@+id/nav_Esdras"
+                android:icon="@drawable/ic_pageview_enable"
+                android:title="Esdras" />
+            <item
+                android:id="@+id/nav_Nehemías"
+                android:icon="@drawable/ic_pageview_enable"
+                android:title="Nehemías" />
+            <item
+                android:id="@+id/nav_Ester"
+                android:icon="@drawable/ic_pageview_enable"
+                android:title="Ester" />
+            <item
+                android:id="@+id/nav_Job"
+                android:icon="@drawable/ic_pageview_enable"
+                android:title="Job" />
+            <item
+                android:id="@+id/nav_Salmos"
+                android:icon="@drawable/ic_pageview_enable"
+                android:title="Salmos" />
+            <item
+                android:id="@+id/nav_Proverbios"
+                android:icon="@drawable/ic_pageview_enable"
+                android:title="Proverbios" />
+            <item
+                android:id="@+id/nav_Eclesiastés"
+                android:icon="@drawable/ic_pageview_enable"
+                android:title="Eclesiastés" />
+            <item
+                android:id="@+id/nav_Cantares"
+                android:icon="@drawable/ic_pageview_enable"
+                android:title="Cantares" />
+            <item
+                android:id="@+id/nav_Isaías"
+                android:icon="@drawable/ic_pageview_enable"
+                android:title="Isaías" />
+            <item
+                android:id="@+id/nav_Jeremías"
+                android:icon="@drawable/ic_pageview_enable"
+                android:title="Jeremías" />
+            <item
+                android:id="@+id/nav_Lamentaciones"
+                android:icon="@drawable/ic_pageview_enable"
+                android:title="Lamentaciones" />
+            <item
+                android:id="@+id/nav_Ezequiel"
+                android:icon="@drawable/ic_pageview_enable"
+                android:title="Ezequiel" />
+            <item
+                android:id="@+id/nav_Daniel"
+                android:icon="@drawable/ic_pageview_enable"
+                android:title="Daniel" />
+            <item
+                android:id="@+id/nav_Oseas"
+                android:icon="@drawable/ic_pageview_enable"
+                android:title="Oseas" />
+            <item
+                android:id="@+id/nav_Joel"
+                android:icon="@drawable/ic_pageview_enable"
+                android:title="Joel" />
+            <item
+                android:id="@+id/nav_Amós"
+                android:icon="@drawable/ic_pageview_enable"
+                android:title="Amós" />
+            <item
+                android:id="@+id/nav_Abdías"
+                android:icon="@drawable/ic_pageview_enable"
+                android:title="Abdías" />
+            <item
+                android:id="@+id/nav_Jonás"
+                android:icon="@drawable/ic_pageview_enable"
+                android:title="Jonás" />
+            <item
+                android:id="@+id/nav_Miqueas"
+                android:icon="@drawable/ic_pageview_enable"
+                android:title="Miqueas" />
+            <item
+                android:id="@+id/nav_Nahúm"
+                android:icon="@drawable/ic_pageview_enable"
+                android:title="Nahúm" />
+            <item
+                android:id="@+id/nav_Habacuc"
+                android:icon="@drawable/ic_pageview_enable"
+                android:title="Habacuc" />
+            <item
+                android:id="@+id/nav_Sofonías"
+                android:icon="@drawable/ic_pageview_enable"
+                android:title="Sofonías" />
+            <item
+                android:id="@+id/nav_Hageo"
+                android:icon="@drawable/ic_pageview_enable"
+                android:title="Hageo" />
+            <item
+                android:id="@+id/nav_Zacarías"
+                android:icon="@drawable/ic_pageview_enable"
+                android:title="Zacarías" />
+            <item
+                android:id="@+id/nav_Malaquías"
+                android:icon="@drawable/ic_pageview_enable"
+                android:title="Malaquías" />
+
+        </menu>
+    </item>
+
+    <item android:title="Nuevo Testamento">
+        <menu>
+            <item
+                android:id="@+id/nav_Mateo"
+                android:icon="@drawable/ic_pageview_enable"
+                android:title="Mateo" />
+            <item
+                android:id="@+id/nav_Marcos"
+                android:icon="@drawable/ic_pageview_enable"
+                android:title="Marcos" />
+            <item
+                android:id="@+id/nav_Lucas"
+                android:icon="@drawable/ic_pageview_enable"
+                android:title="Lucas" />
+            <item
+                android:id="@+id/nav_Juan"
+                android:icon="@drawable/ic_pageview_enable"
+                android:title="Juan" />
+            <item
+                android:id="@+id/nav_Hechos"
+                android:icon="@drawable/ic_pageview_enable"
+                android:title="Hechos" />
+            <item
+                android:id="@+id/nav_Romanos"
+                android:icon="@drawable/ic_pageview_enable"
+                android:title="Romanos" />
+            <item
+                android:id="@+id/nav_1Corintios"
+                android:icon="@drawable/ic_pageview_enable"
+                android:title="1 Corintios" />
+            <item
+                android:id="@+id/nav_2Corintios"
+                android:icon="@drawable/ic_pageview_enable"
+                android:title="2 Corintios" />
+            <item
+                android:id="@+id/nav_Gálatas"
+                android:icon="@drawable/ic_pageview_enable"
+                android:title="Gálatas" />
+            <item
+                android:id="@+id/nav_Efesios"
+                android:icon="@drawable/ic_pageview_enable"
+                android:title="Efesios" />
+            <item
+                android:id="@+id/nav_Filipenses"
+                android:icon="@drawable/ic_pageview_enable"
+                android:title="Filipenses" />
+            <item
+                android:id="@+id/nav_Colosenses"
+                android:icon="@drawable/ic_pageview_enable"
+                android:title="Colosenses" />
+            <item
+                android:id="@+id/nav_1Tesalonicenses"
+                android:icon="@drawable/ic_pageview_enable"
+                android:title="1 Tesalonicenses" />
+            <item
+                android:id="@+id/nav_2Tesalonicenses"
+                android:icon="@drawable/ic_pageview_enable"
+                android:title="2 Tesalonicenses" />
+            <item
+                android:id="@+id/nav_1Timoteo"
+                android:icon="@drawable/ic_pageview_enable"
+                android:title="1 Timoteo" />
+            <item
+                android:id="@+id/nav_2Timoteo"
+                android:icon="@drawable/ic_pageview_enable"
+                android:title="2 Timoteo" />
+            <item
+                android:id="@+id/nav_Tito"
+                android:icon="@drawable/ic_pageview_enable"
+                android:title="Tito" />
+            <item
+                android:id="@+id/nav_Filemón"
+                android:icon="@drawable/ic_pageview_enable"
+                android:title="Filemón" />
+            <item
+                android:id="@+id/nav_Hebreos"
+                android:icon="@drawable/ic_pageview_enable"
+                android:title="Hebreos" />
+            <item
+                android:id="@+id/nav_Santiago"
+                android:icon="@drawable/ic_pageview_enable"
+                android:title="Santiago" />
+            <item
+                android:id="@+id/nav_1Pedro"
+                android:icon="@drawable/ic_pageview_enable"
+                android:title="1 Pedro" />
+            <item
+                android:id="@+id/nav_2Pedro"
+                android:icon="@drawable/ic_pageview_enable"
+                android:title="2 Pedro" />
+            <item
+                android:id="@+id/nav_1Juan"
+                android:icon="@drawable/ic_pageview_enable"
+                android:title="1 Juan" />
+            <item
+                android:id="@+id/nav_2Juan"
+                android:icon="@drawable/ic_pageview_enable"
+                android:title="2 Juan" />
+            <item
+                android:id="@+id/nav_3Juan"
+                android:icon="@drawable/ic_pageview_enable"
+                android:title="3 Juan" />
+            <item
+                android:id="@+id/nav_Judas"
+                android:icon="@drawable/ic_pageview_enable"
+                android:title="Judas" />
+            <item
+                android:id="@+id/nav_Apocalipsis"
+                android:icon="@drawable/ic_pageview_enable"
+                android:title="Apocalipsis" />
+
+        </menu>
+    </item>
+
+</menu>
