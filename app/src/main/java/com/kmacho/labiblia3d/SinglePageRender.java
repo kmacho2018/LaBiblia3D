@@ -33,6 +33,7 @@ public class SinglePageRender extends PageRender {
 
     public static Display cDisplay;
     public static TextToSpeech textToSpeech;
+    public static Boolean speechEnable;
 
     /**
      * Constructor
@@ -40,17 +41,17 @@ public class SinglePageRender extends PageRender {
      * @see {@link #PageRender(Context, PageFlip, Handler, int)}
      */
     public SinglePageRender(Context context, PageFlip pageFlip,
-                            Handler handler, int pageNo, String text, Display currentDisplay, TextToSpeech textToSpeech1) {
+                            Handler handler, int pageNo, String text, Display currentDisplay, TextToSpeech textToSpeech1, Boolean speech_Enable) {
 
 
-        super(context, pageFlip, handler, pageNo, getPagesCount(text, currentDisplay, textToSpeech1));
+        super(context, pageFlip, handler, pageNo, getPagesCount(text, currentDisplay, textToSpeech1, speech_Enable));
     }
 
-    public static int getPagesCount(String text, Display currentDisplay, TextToSpeech textToSpeech1) {
+    public static int getPagesCount(String text, Display currentDisplay, TextToSpeech textToSpeech1, Boolean speech_Enable) {
 
         textToSpeech = textToSpeech1;
 
-
+        speechEnable = speech_Enable;
 
         List<String> paragraphList = new ArrayList<String>();
         String[] splitText = text.split(" ");
@@ -493,7 +494,7 @@ public class SinglePageRender extends PageRender {
 
 
         List<String> ParrafosToShow = Pages.get(number);
-        String parrafo ="";
+        String parrafo = "";
         if (ParrafosToShow != null) {
 
             for (String parrafoToShow : ParrafosToShow) {
@@ -504,11 +505,12 @@ public class SinglePageRender extends PageRender {
 
             }
         }
-        textToSpeech.stop();
-        Locale locSpanish = new Locale("spa", "MEX");
-        textToSpeech.setLanguage(locSpanish);
-        textToSpeech.speak(parrafo, TextToSpeech.QUEUE_ADD, null);
-
+        if (speechEnable) {
+            textToSpeech.stop();
+            Locale locSpanish = new Locale("spa", "MEX");
+            textToSpeech.setLanguage(locSpanish);
+            textToSpeech.speak(parrafo, TextToSpeech.QUEUE_ADD, null);
+        }
 
         /*****************************************************************************************************************/
 

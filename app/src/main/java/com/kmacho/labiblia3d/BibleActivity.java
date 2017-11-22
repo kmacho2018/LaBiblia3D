@@ -42,8 +42,17 @@ public class BibleActivity extends Activity implements GestureDetector.OnGesture
     int cnt = 0;
     TextToSpeech textToSpeech1;
     int MY_DATA_CHECK_CODE = 1000;
+    boolean speechEnable;
 
     private InterstitialAd mInterstitialAd;
+
+
+    @Override
+    public void onDestroy() {
+        textToSpeech1.stop();
+        super.onDestroy();
+
+    }
 
     private int getStringResourceByName(String aString) {
         String packageName = getPackageName();
@@ -63,7 +72,9 @@ public class BibleActivity extends Activity implements GestureDetector.OnGesture
         intent2.setAction(TextToSpeech.Engine.ACTION_CHECK_TTS_DATA);
         startActivityForResult(intent2, MY_DATA_CHECK_CODE);
 
+        Intent intent = getIntent();
 
+        speechEnable = Boolean.valueOf(intent.getStringExtra("speech"));
     }
 
 
@@ -94,6 +105,7 @@ public class BibleActivity extends Activity implements GestureDetector.OnGesture
 
         if (requestCode == MY_DATA_CHECK_CODE) {
             if (resultCode == TextToSpeech.Engine.CHECK_VOICE_DATA_PASS) {
+
                 textToSpeech1 = new TextToSpeech(this, this);
                 Intent intent = getIntent();
 
@@ -105,7 +117,7 @@ public class BibleActivity extends Activity implements GestureDetector.OnGesture
                 loadInterstitial();
                 String texto = "";
 
-                mPageFlipView = new PageFlipView(this, getString(getStringResourceByName(id)), getWindowManager().getDefaultDisplay(), textToSpeech1);
+                mPageFlipView = new PageFlipView(this, getString(getStringResourceByName(id)), getWindowManager().getDefaultDisplay(), textToSpeech1,speechEnable);
 
                 this.setRequestedOrientation(ActivityInfo.SCREEN_ORIENTATION_PORTRAIT);
 
@@ -138,108 +150,144 @@ public class BibleActivity extends Activity implements GestureDetector.OnGesture
     @Override
     public void onInit(int i) {
         if (i == TextToSpeech.SUCCESS) {
-            Intent intent = getIntent();
-            String id = intent.getStringExtra("key");
-            String text = getString(getStringResourceByName(id));
+            if (speechEnable) {
+                Intent intent = getIntent();
+                String id = intent.getStringExtra("key");
+                String text = getString(getStringResourceByName(id));
 
-            List<String> paragraphList = new ArrayList<String>();
-            String[] splitText = text.split(" ");
+                List<String> paragraphList = new ArrayList<String>();
+                String[] splitText = text.split(" ");
 
-            Point size = new Point();
-            getWindowManager().getDefaultDisplay().getSize(size);
-            int width = size.x;
-            int height = size.y;
+                Point size = new Point();
+                getWindowManager().getDefaultDisplay().getSize(size);
+                int width = size.x;
+                int height = size.y;
 
-            int lettersPerLine = 26;
-            int LimitRows = 24;
+                int lettersPerLine = 26;
+                int LimitRows = 24;
 
-            //Tablets
-            if ((width >= 1190 && width <= 1210) && (height >= 1420 && height <= 1470)) { // 1920 x 1080
-                lettersPerLine = 21;
-                LimitRows = 23;
-            } else if ((width >= 580 && width <= 620) && (height >= 900 && height <= 1024)) { // 600 - 1024
-                lettersPerLine = 28;
-                LimitRows = 19;
-            } else if ((width >= 790 && width <= 820) && (height >= 1100 && height <= 1290)) { // 800 - 1280
-                lettersPerLine = 28;
-                LimitRows = 25;
-                if ((width >= 800 && width <= 810) && (height >= 1100 && height <= 1190)) { //1280 - 800)
-                    lettersPerLine = 22;
+                //Tablets
+                if ((width >= 1190 && width <= 1210) && (height >= 1420 && height <= 1470)) { // 1920 x 1080
+                    lettersPerLine = 21;
                     LimitRows = 23;
-                }
-                if ((width >= 800 && width <= 810) && (height >= 1210 && height <= 1220)) { //nexus 7 2012 (800 - 1280)
-                    lettersPerLine = 19;
+                } else if ((width >= 580 && width <= 620) && (height >= 900 && height <= 1024)) { // 600 - 1024
+                    lettersPerLine = 28;
                     LimitRows = 19;
-                }
-            } else if ((width >= 1100 && width <= 1210) && (height >= 1800 && height <= 1940)) { // 1200 - 1920
-                lettersPerLine = 18;
-                LimitRows = 24;
-                if ((width >= 1200 && width <= 1210) && (height >= 1810 && height <= 1830)) {
-                    lettersPerLine = 19;
-                    LimitRows = 30;
-                }
-            } else if ((width >= 1500 && width <= 2048) && (height >= 1500 && height <= 2000)) { // 2048 - 1530
-                lettersPerLine = 25;
-                LimitRows = 26;
-                if ((width >= 1530 && width <= 1545) && (height >= 1900 && height <= 1910)) { //1536 x 2048
-                    lettersPerLine = 20;
-                    LimitRows = 24;
-                }
-            } else if ((width >= 1500 && width <= 2048) && (height >= 2000 && height <= 2600)) { // 2560 - 1600
-                lettersPerLine = 25;
-                LimitRows = 26;
-                if ((width >= 1790 && width <= 1810) && (height >= 2450 && height <= 2470)) { //2560  - 1800
-                    lettersPerLine = 32;
-                    LimitRows = 32;
-                }
-                if ((width >= 1590 && width <= 1610) && (height >= 2454 && height <= 2474)) { //1600-2464
-                    lettersPerLine = 30;
-                    LimitRows = 32;
-                }
-            }
-
-            //Cellphones
-            else if ((width >= 450 && width <= 490) && (height >= 750 && height <= 810)) { // 480 x 800
-                lettersPerLine = 23;
-                LimitRows = 15;
-            } else if ((width >= 470 && width <= 490) && (height >= 840 && height <= 860)) { // 480x854
-                lettersPerLine = 23;
-                LimitRows = 16;
-            } else if ((width >= 720 && width <= 750) && (height >= 1100 && height <= 1290)) { // 720 x 1280
-                lettersPerLine = 28;
-                LimitRows = 24;
-            } else if ((width >= 750 && width <= 780) && (height >= 1100 && height <= 1290)) { // 768 x 1280
-                lettersPerLine = 27;
-                LimitRows = 24;
-            } else if ((width >= 1000 && width <= 1100) && (height >= 1600 && height <= 1950)) { // 1080 x 1920
-                lettersPerLine = 27;
-                LimitRows = 36;
-            } else if ((width >= 1000 && width <= 1460) && (height >= 1600 && height <= 2580)) { // 1440 x 2560
-                lettersPerLine = 24;
-                LimitRows = 41;
-                if ((width >= 1190 && width <= 1210) && (height >= 1760 && height <= 1780)) { // 1920  x 1200 ->Tablet
-                    lettersPerLine = 24;
-                    LimitRows = 30;
-                }
-            }
-
-
-            int cnt = 0, cnt2 = 0, cnt3 = 0;
-            String paragraph = "";
-            for (String word : splitText
-                    ) {
-                int wordLength = word.length();
-                if (word.replace("\n\n", "\n").contains("\n")) {
-                    word = word.replace("\n\n", "\n");
-                    String[] words = word.split("\n");
-                    if (words.length > 0) {
-                        word = words[0];
+                } else if ((width >= 790 && width <= 820) && (height >= 1100 && height <= 1290)) { // 800 - 1280
+                    lettersPerLine = 28;
+                    LimitRows = 25;
+                    if ((width >= 800 && width <= 810) && (height >= 1100 && height <= 1190)) { //1280 - 800)
+                        lettersPerLine = 22;
+                        LimitRows = 23;
                     }
-                    if (words.length == 0) {
-                        paragraphList.add(paragraph);
-                        paragraph = String.format(" %s", word);
-                        paragraphList.add(paragraph);
-                        cnt = 0;
+                    if ((width >= 800 && width <= 810) && (height >= 1210 && height <= 1220)) { //nexus 7 2012 (800 - 1280)
+                        lettersPerLine = 19;
+                        LimitRows = 19;
+                    }
+                } else if ((width >= 1100 && width <= 1210) && (height >= 1800 && height <= 1940)) { // 1200 - 1920
+                    lettersPerLine = 18;
+                    LimitRows = 24;
+                    if ((width >= 1200 && width <= 1210) && (height >= 1810 && height <= 1830)) {
+                        lettersPerLine = 19;
+                        LimitRows = 30;
+                    }
+                } else if ((width >= 1500 && width <= 2048) && (height >= 1500 && height <= 2000)) { // 2048 - 1530
+                    lettersPerLine = 25;
+                    LimitRows = 26;
+                    if ((width >= 1530 && width <= 1545) && (height >= 1900 && height <= 1910)) { //1536 x 2048
+                        lettersPerLine = 20;
+                        LimitRows = 24;
+                    }
+                } else if ((width >= 1500 && width <= 2048) && (height >= 2000 && height <= 2600)) { // 2560 - 1600
+                    lettersPerLine = 25;
+                    LimitRows = 26;
+                    if ((width >= 1790 && width <= 1810) && (height >= 2450 && height <= 2470)) { //2560  - 1800
+                        lettersPerLine = 32;
+                        LimitRows = 32;
+                    }
+                    if ((width >= 1590 && width <= 1610) && (height >= 2454 && height <= 2474)) { //1600-2464
+                        lettersPerLine = 30;
+                        LimitRows = 32;
+                    }
+                }
+
+                //Cellphones
+                else if ((width >= 450 && width <= 490) && (height >= 750 && height <= 810)) { // 480 x 800
+                    lettersPerLine = 23;
+                    LimitRows = 15;
+                } else if ((width >= 470 && width <= 490) && (height >= 840 && height <= 860)) { // 480x854
+                    lettersPerLine = 23;
+                    LimitRows = 16;
+                } else if ((width >= 720 && width <= 750) && (height >= 1100 && height <= 1290)) { // 720 x 1280
+                    lettersPerLine = 28;
+                    LimitRows = 24;
+                } else if ((width >= 750 && width <= 780) && (height >= 1100 && height <= 1290)) { // 768 x 1280
+                    lettersPerLine = 27;
+                    LimitRows = 24;
+                } else if ((width >= 1000 && width <= 1100) && (height >= 1600 && height <= 1950)) { // 1080 x 1920
+                    lettersPerLine = 27;
+                    LimitRows = 36;
+                } else if ((width >= 1000 && width <= 1460) && (height >= 1600 && height <= 2580)) { // 1440 x 2560
+                    lettersPerLine = 24;
+                    LimitRows = 41;
+                    if ((width >= 1190 && width <= 1210) && (height >= 1760 && height <= 1780)) { // 1920  x 1200 ->Tablet
+                        lettersPerLine = 24;
+                        LimitRows = 30;
+                    }
+                }
+
+
+                int cnt = 0, cnt2 = 0, cnt3 = 0;
+                String paragraph = "";
+                for (String word : splitText
+                        ) {
+                    int wordLength = word.length();
+                    if (word.replace("\n\n", "\n").contains("\n")) {
+                        word = word.replace("\n\n", "\n");
+                        String[] words = word.split("\n");
+                        if (words.length > 0) {
+                            word = words[0];
+                        }
+                        if (words.length == 0) {
+                            paragraphList.add(paragraph);
+                            paragraph = String.format(" %s", word);
+                            paragraphList.add(paragraph);
+                            cnt = 0;
+                        } else {
+                            if (cnt + wordLength <= lettersPerLine) {
+                                paragraph = paragraph + String.format(" %s", word);
+                                cnt = cnt + wordLength;
+                            } else {
+                                paragraphList.add(paragraph);
+                                paragraph = String.format(" %s", word);
+                                cnt = 0;
+                            }
+                            cnt = lettersPerLine + 1;
+                            if (words.length > 1) {
+                                word = words[1];
+                            } else {
+                                word = words[0];
+                            }
+                            if (cnt + wordLength <= lettersPerLine) {
+                                paragraph = paragraph + String.format(" %s", word);
+                                cnt = cnt + wordLength;
+                            } else {
+                                paragraphList.add(paragraph);
+                                if (paragraph.replace(" ", "").equals("\n")) {
+                                    paragraph = String.format(" %s", word);
+                                    cnt = 0;
+                                } else {
+
+                                    if (paragraph.substring((paragraph.length() - word.length()), paragraph.length()).equals(word)) {
+                                        paragraph = String.format(" %s", "\n");
+                                        cnt = 0;
+                                    } else {
+                                        paragraph = String.format(" %s", word);
+                                        cnt = 0;
+                                    }
+                                }
+                            }
+                        }
                     } else {
                         if (cnt + wordLength <= lettersPerLine) {
                             paragraph = paragraph + String.format(" %s", word);
@@ -249,114 +297,79 @@ public class BibleActivity extends Activity implements GestureDetector.OnGesture
                             paragraph = String.format(" %s", word);
                             cnt = 0;
                         }
-                        cnt = lettersPerLine + 1;
-                        if (words.length > 1) {
-                            word = words[1];
-                        } else {
-                            word = words[0];
-                        }
-                        if (cnt + wordLength <= lettersPerLine) {
-                            paragraph = paragraph + String.format(" %s", word);
-                            cnt = cnt + wordLength;
-                        } else {
-                            paragraphList.add(paragraph);
-                            if (paragraph.replace(" ", "").equals("\n")) {
-                                paragraph = String.format(" %s", word);
-                                cnt = 0;
-                            } else {
-
-                                if (paragraph.substring((paragraph.length() - word.length()), paragraph.length()).equals(word)) {
-                                    paragraph = String.format(" %s", "\n");
-                                    cnt = 0;
-                                } else {
-                                    paragraph = String.format(" %s", word);
-                                    cnt = 0;
-                                }
-                            }
-                        }
                     }
-                } else {
-                    if (cnt + wordLength <= lettersPerLine) {
-                        paragraph = paragraph + String.format(" %s", word);
-                        cnt = cnt + wordLength;
-                    } else {
+                    cnt2++;
+                    if (cnt2 == splitText.length && (paragraph.length() <= lettersPerLine)) {
                         paragraphList.add(paragraph);
-                        paragraph = String.format(" %s", word);
+                    } else if (cnt2 == splitText.length && (paragraph.length() > lettersPerLine)) {
                         cnt = 0;
+                        String paragraph2 = "";
+                        int count = 0;
+                        cnt3 = paragraph.split(" ").length;
+                        for (String SubWord : paragraph.split(" ")
+                                ) {
+                            count++;
+                            wordLength = SubWord.length();
+
+                            if (cnt + wordLength <= lettersPerLine) {
+                                paragraph2 = paragraph2 + String.format(" %s", SubWord);
+                                cnt = paragraph2.length();
+                            } else {
+                                paragraphList.add(paragraph2);
+                                paragraph2 = String.format(" %s", SubWord);
+                                if (count == cnt3) {
+                                    paragraphList.add(paragraph2);
+                                }
+                                cnt = 0;
+                            }
+
+                        }
                     }
                 }
-                cnt2++;
-                if (cnt2 == splitText.length && (paragraph.length() <= lettersPerLine)) {
-                    paragraphList.add(paragraph);
-                } else if (cnt2 == splitText.length && (paragraph.length() > lettersPerLine)) {
-                    cnt = 0;
-                    String paragraph2 = "";
-                    int count = 0;
-                    cnt3 = paragraph.split(" ").length;
-                    for (String SubWord : paragraph.split(" ")
-                            ) {
-                        count++;
-                        wordLength = SubWord.length();
+                //Creando las paginas con sus respectivos parrafos
 
-                        if (cnt + wordLength <= lettersPerLine) {
-                            paragraph2 = paragraph2 + String.format(" %s", SubWord);
-                            cnt = paragraph2.length();
-                        } else {
-                            paragraphList.add(paragraph2);
-                            paragraph2 = String.format(" %s", SubWord);
-                            if (count == cnt3) {
-                                paragraphList.add(paragraph2);
-                            }
-                            cnt = 0;
+                int rowsCount = 0;
+                int PageNumber = 1;
+                cnt = 0;
+                int totalParrafos = paragraphList.size();
+                Map<Integer, List<String>> Pages = new HashMap<Integer, List<String>>();
+                List<String> parrafosAgrupadosPorPagina = new ArrayList<String>();
+                for (String element : paragraphList
+                        ) {
+                    if (rowsCount >= LimitRows) {
+                        Pages.put(PageNumber, parrafosAgrupadosPorPagina);
+                        parrafosAgrupadosPorPagina = new ArrayList<String>();
+                        PageNumber++;
+                        rowsCount = 1;
+                        parrafosAgrupadosPorPagina.add(element);
+                    } else {
+                        parrafosAgrupadosPorPagina.add(element);
+                        rowsCount++;
+                        if (cnt == (totalParrafos - 1)) {
+                            Pages.put(PageNumber, parrafosAgrupadosPorPagina);
                         }
 
                     }
-                }
-            }
-            //Creando las paginas con sus respectivos parrafos
+                    cnt++;
 
-            int rowsCount = 0;
-            int PageNumber = 1;
-            cnt = 0;
-            int totalParrafos = paragraphList.size();
-            Map<Integer, List<String>> Pages = new HashMap<Integer, List<String>>();
-            List<String> parrafosAgrupadosPorPagina = new ArrayList<String>();
-            for (String element : paragraphList
-                    ) {
-                if (rowsCount >= LimitRows) {
-                    Pages.put(PageNumber, parrafosAgrupadosPorPagina);
-                    parrafosAgrupadosPorPagina = new ArrayList<String>();
-                    PageNumber++;
-                    rowsCount = 1;
-                    parrafosAgrupadosPorPagina.add(element);
-                } else {
-                    parrafosAgrupadosPorPagina.add(element);
-                    rowsCount++;
-                    if (cnt == (totalParrafos - 1)) {
-                        Pages.put(PageNumber, parrafosAgrupadosPorPagina);
+                }
+
+
+                List<String> ParrafosToShow = Pages.get(1);
+                String parrafo = "";
+                if (ParrafosToShow != null) {
+                    for (String parrafoToShow : ParrafosToShow) {
+                        parrafo = parrafo + parrafoToShow;
                     }
-
                 }
-                cnt++;
 
+
+                //Toast.makeText(this, "Success!!", Toast.LENGTH_SHORT).show();
+                textToSpeech1.stop();
+                Locale locSpanish = new Locale("spa", "MEX");
+                textToSpeech1.setLanguage(locSpanish);
+                textToSpeech1.speak(parrafo, TextToSpeech.QUEUE_ADD, null);
             }
-
-
-            List<String> ParrafosToShow = Pages.get(1);
-            String parrafo = "";
-            if (ParrafosToShow != null) {
-                for (String parrafoToShow : ParrafosToShow) {
-                    parrafo = parrafo + parrafoToShow;
-                }
-            }
-
-
-            //Toast.makeText(this, "Success!!", Toast.LENGTH_SHORT).show();
-            textToSpeech1.stop();
-            Locale locSpanish = new Locale("spa", "MEX");
-            textToSpeech1.setLanguage(locSpanish);
-            textToSpeech1.speak(parrafo, TextToSpeech.QUEUE_ADD, null);
-
         } else if (i == TextToSpeech.ERROR) {
             Toast.makeText(this, "Error!!", Toast.LENGTH_SHORT).show();
         }

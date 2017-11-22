@@ -36,9 +36,10 @@ public class PageFlipView extends GLSurfaceView implements GLSurfaceView.Rendere
     Display curDisplay;
 String textContent = "";
      TextToSpeech textToSpeech;
+     Boolean speechEnable;
 
 
-    public PageFlipView(Context context,String texto,Display currentDisplay,TextToSpeech textToSpeech1) {
+    public PageFlipView(Context context,String texto,Display currentDisplay,TextToSpeech textToSpeech1,Boolean speech_Enable) {
         super(context);
 
         textToSpeech = textToSpeech1;
@@ -71,7 +72,7 @@ curDisplay = currentDisplay;
         mPageNo = 1;
         mDrawLock = new ReentrantLock();
         mPageRender = new SinglePageRender(context, mPageFlip,
-                mHandler, mPageNo,textContent,currentDisplay,textToSpeech1);
+                mHandler, mPageNo,textContent,currentDisplay,textToSpeech1,speech_Enable);
         // configure render
         setRenderer(this);
         setRenderMode(GLSurfaceView.RENDERMODE_WHEN_DIRTY);
@@ -109,7 +110,7 @@ curDisplay = currentDisplay;
                     mPageRender = new SinglePageRender(getContext(),
                             mPageFlip,
                             mHandler,
-                            mPageNo,textContent,currentDiplay,textToSpeech);
+                            mPageNo,textContent,currentDiplay,textToSpeech,speechEnable);
                     mPageRender.onSurfaceChanged(mPageFlip.getSurfaceWidth(),
                             mPageFlip.getSurfaceHeight());
                 }
@@ -261,7 +262,7 @@ curDisplay = currentDisplay;
                 mPageRender = new SinglePageRender(getContext(),
                         mPageFlip,
                         mHandler,
-                        pageNo,textContent,curDisplay,textToSpeech);
+                        pageNo,textContent,curDisplay,textToSpeech,speechEnable);
             }
 
             // let page render handle surface change

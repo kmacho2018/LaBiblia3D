@@ -36,6 +36,7 @@ public class MainActivity extends AppCompatActivity
 
     public String activityTitle;
     private InterstitialAd mInterstitialAd;
+    Switch speechCheck;
 
 
     @Override
@@ -43,19 +44,19 @@ public class MainActivity extends AppCompatActivity
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
 
-        LinearLayout linearLayout =  (LinearLayout)findViewById(R.id.mainmenu);
 
         // Create the InterstitialAd and set the adUnitId (defined in values/strings.xml).
         mInterstitialAd = newInterstitialAd();
-        loadInterstitial();
+        //loadInterstitial();
         // Load an ad into the AdMob banner view.
         AdView adView = (AdView) findViewById(R.id.adView);
         AdRequest adRequest = new AdRequest.Builder()
                 .setRequestAgent("android_studio:ad_template").build();
-        adView.loadAd(adRequest);
+        //adView.loadAd(adRequest);
 
         Toolbar toolbar = (Toolbar) findViewById(R.id.toolbar);
         setSupportActionBar(toolbar);
+
 
 
         FloatingActionButton fabNext = (FloatingActionButton) findViewById(R.id.fabNext);
@@ -500,6 +501,18 @@ public class MainActivity extends AppCompatActivity
 
         NavigationView navigationView = (NavigationView) findViewById(R.id.nav_view);
         navigationView.setNavigationItemSelectedListener(this);
+
+
+        LinearLayout linear  = (LinearLayout) navigationView.getHeaderView(0);
+        LinearLayout linear2  = (LinearLayout) linear.getChildAt(0);
+
+        speechCheck =  (Switch)linear2.getChildAt(1);
+        speechCheck.setOnCheckedChangeListener(new CompoundButton.OnCheckedChangeListener() {
+            @Override
+            public void onCheckedChanged(CompoundButton compoundButton, boolean b) {
+                Toast.makeText(MainActivity.this, String.valueOf(b), Toast.LENGTH_SHORT).show();
+            }
+        });
 
         generateChapters("Génesis");
 
@@ -1147,6 +1160,7 @@ public class MainActivity extends AppCompatActivity
                         } else {
                             Intent myIntent = new Intent(MainActivity.this, BibleActivity.class);
                             myIntent.putExtra("key", formatChapterName(book + "_" + finalI)); //Optional parameters
+                            myIntent.putExtra("speech",String.valueOf(speechCheck.isChecked()));
                             MainActivity.this.startActivity(myIntent);
                         }
                     }
