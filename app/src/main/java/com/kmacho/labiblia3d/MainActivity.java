@@ -4,6 +4,7 @@ import android.app.ActionBar;
 import android.content.Intent;
 import android.graphics.Color;
 import android.os.Bundle;
+import android.support.design.internal.NavigationMenu;
 import android.support.design.widget.FloatingActionButton;
 import android.support.design.widget.Snackbar;
 import android.support.v7.app.AlertDialog;
@@ -18,8 +19,10 @@ import android.support.v7.widget.Toolbar;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.widget.Button;
+import android.widget.CompoundButton;
 import android.widget.LinearLayout;
 import android.widget.ScrollView;
+import android.widget.Switch;
 import android.widget.TextView;
 import android.widget.Toast;
 
@@ -40,6 +43,8 @@ public class MainActivity extends AppCompatActivity
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
 
+        LinearLayout linearLayout =  (LinearLayout)findViewById(R.id.mainmenu);
+
         // Create the InterstitialAd and set the adUnitId (defined in values/strings.xml).
         mInterstitialAd = newInterstitialAd();
         loadInterstitial();
@@ -51,6 +56,7 @@ public class MainActivity extends AppCompatActivity
 
         Toolbar toolbar = (Toolbar) findViewById(R.id.toolbar);
         setSupportActionBar(toolbar);
+
 
         FloatingActionButton fabNext = (FloatingActionButton) findViewById(R.id.fabNext);
         fabNext.setOnClickListener(new View.OnClickListener() {
@@ -1151,4 +1157,6 @@ public class MainActivity extends AppCompatActivity
 
         scrollview1.setScrollY(0);
     }
+
+
 }

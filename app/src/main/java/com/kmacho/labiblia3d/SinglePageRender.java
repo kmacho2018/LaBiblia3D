@@ -9,6 +9,7 @@ import android.graphics.Point;
 import android.graphics.Rect;
 import android.os.Handler;
 import android.os.Message;
+import android.speech.tts.TextToSpeech;
 import android.view.Display;
 
 import com.kmacho.pageflip.Page;
@@ -18,6 +19,7 @@ import com.kmacho.pageflip.PageFlipState;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
+import java.util.Locale;
 import java.util.Map;
 
 
@@ -30,6 +32,7 @@ public class SinglePageRender extends PageRender {
     public static Map<Integer, List<String>> Pages = new HashMap<Integer, List<String>>();
 
     public static Display cDisplay;
+    public static TextToSpeech textToSpeech;
 
     /**
      * Constructor
@@ -37,13 +40,16 @@ public class SinglePageRender extends PageRender {
      * @see {@link #PageRender(Context, PageFlip, Handler, int)}
      */
     public SinglePageRender(Context context, PageFlip pageFlip,
-                            Handler handler, int pageNo, String text, Display currentDisplay) {
+                            Handler handler, int pageNo, String text, Display currentDisplay, TextToSpeech textToSpeech1) {
 
 
-        super(context, pageFlip, handler, pageNo, getPagesCount(text, currentDisplay));
+        super(context, pageFlip, handler, pageNo, getPagesCount(text, currentDisplay, textToSpeech1));
     }
 
-    public static int getPagesCount(String text, Display currentDisplay) {
+    public static int getPagesCount(String text, Display currentDisplay, TextToSpeech textToSpeech1) {
+
+        textToSpeech = textToSpeech1;
+
 
 
         List<String> paragraphList = new ArrayList<String>();
@@ -62,8 +68,7 @@ public class SinglePageRender extends PageRender {
         if ((width >= 1190 && width <= 1210) && (height >= 1420 && height <= 1470)) { // 1920 x 1080
             lettersPerLine = 21;
             LimitRows = 23;
-        }
-        else if ((width >= 580 && width <= 620) && (height >= 900 && height <= 1024)) { // 600 - 1024
+        } else if ((width >= 580 && width <= 620) && (height >= 900 && height <= 1024)) { // 600 - 1024
             lettersPerLine = 28;
             LimitRows = 19;
         } else if ((width >= 790 && width <= 820) && (height >= 1100 && height <= 1290)) { // 800 - 1280
@@ -88,7 +93,7 @@ public class SinglePageRender extends PageRender {
             lettersPerLine = 25;
             LimitRows = 26;
             if ((width >= 1530 && width <= 1545) && (height >= 1900 && height <= 1910)) { //1536 x 2048
-                lettersPerLine = 20 ;
+                lettersPerLine = 20;
                 LimitRows = 24;
             }
         } else if ((width >= 1500 && width <= 2048) && (height >= 2000 && height <= 2600)) { // 2560 - 1600
@@ -411,12 +416,11 @@ public class SinglePageRender extends PageRender {
         }
 
         //Tablets
-         if ((displayWidth >= 1190 && displayWidth <= 1210) && (displayHeight >= 1420 && displayHeight <= 1470)) { // 1920 x 1080
+        if ((displayWidth >= 1190 && displayWidth <= 1210) && (displayHeight >= 1420 && displayHeight <= 1470)) { // 1920 x 1080
             fontSize = calcFontSize(20);
             rowPosition = 50;
             incrPosition = 65;
-        }
-        else if ((displayWidth >= 580 && displayWidth <= 620) && (displayHeight >= 900 && displayHeight <= 1024)) { // 600 - 1024
+        } else if ((displayWidth >= 580 && displayWidth <= 620) && (displayHeight >= 900 && displayHeight <= 1024)) { // 600 - 1024
             fontSize = calcFontSize(25);
             rowPosition = 50;
             incrPosition = 50;
@@ -445,7 +449,7 @@ public class SinglePageRender extends PageRender {
             if ((displayWidth >= 1530 && displayWidth <= 1545) && (displayHeight >= 1900 && displayHeight <= 1910)) { //1536 x 2048
                 fontSize = calcFontSize(28);
                 rowPosition = 100;
-                incrPosition =80;
+                incrPosition = 80;
             }
         } else if ((displayWidth >= 1500 && displayWidth <= 2048) && (displayHeight >= 2000 && displayHeight <= 2600)) { // 2560 - 1600
             fontSize = calcFontSize(35);
@@ -489,15 +493,22 @@ public class SinglePageRender extends PageRender {
 
 
         List<String> ParrafosToShow = Pages.get(number);
+        String parrafo ="";
         if (ParrafosToShow != null) {
 
             for (String parrafoToShow : ParrafosToShow) {
 
                 mCanvas.drawText(parrafoToShow, 50, rowPosition, p);
                 rowPosition = rowPosition + incrPosition;
+                parrafo = parrafo + parrafoToShow;
 
             }
         }
+        textToSpeech.stop();
+        Locale locSpanish = new Locale("spa", "MEX");
+        textToSpeech.setLanguage(locSpanish);
+        textToSpeech.speak(parrafo, TextToSpeech.QUEUE_ADD, null);
+
 
         /*****************************************************************************************************************/
 
@@ -541,5 +552,6 @@ public class SinglePageRender extends PageRender {
             return false;
         }
     }
+
 }
 

@@ -30,6 +30,7 @@
         android:layout_margin="@dimen/fab_margin"
         app:srcCompat="@drawable/next" />
 
+
     <android.support.design.widget.FloatingActionButton
         android:id="@+id/fabBack"
         android:layout_width="wrap_content"
@@ -37,5 +38,6 @@
         android:layout_gravity="center|start"
         android:layout_margin="@dimen/fab_margin"
         app:srcCompat="@drawable/back" />
+
 
 </android.support.design.widget.CoordinatorLayout>

@@ -6,6 +6,7 @@ import android.opengl.GLSurfaceView;
 import android.os.Handler;
 import android.os.Message;
 import android.preference.PreferenceManager;
+import android.speech.tts.TextToSpeech;
 import android.util.Log;
 import android.view.Display;
 
@@ -34,9 +35,13 @@ public class PageFlipView extends GLSurfaceView implements GLSurfaceView.Rendere
     ReentrantLock mDrawLock;
     Display curDisplay;
 String textContent = "";
+     TextToSpeech textToSpeech;
 
-    public PageFlipView(Context context,String texto,Display currentDisplay) {
+
+    public PageFlipView(Context context,String texto,Display currentDisplay,TextToSpeech textToSpeech1) {
         super(context);
+
+        textToSpeech = textToSpeech1;
 
         // create handler to tackle message
         newHandler();
@@ -66,7 +71,7 @@ curDisplay = currentDisplay;
         mPageNo = 1;
         mDrawLock = new ReentrantLock();
         mPageRender = new SinglePageRender(context, mPageFlip,
-                mHandler, mPageNo,textContent,currentDisplay);
+                mHandler, mPageNo,textContent,currentDisplay,textToSpeech1);
         // configure render
         setRenderer(this);
         setRenderMode(GLSurfaceView.RENDERMODE_WHEN_DIRTY);
@@ -104,7 +109,7 @@ curDisplay = currentDisplay;
                     mPageRender = new SinglePageRender(getContext(),
                             mPageFlip,
                             mHandler,
-                            mPageNo,textContent,currentDiplay);
+                            mPageNo,textContent,currentDiplay,textToSpeech);
                     mPageRender.onSurfaceChanged(mPageFlip.getSurfaceWidth(),
                             mPageFlip.getSurfaceHeight());
                 }
@@ -256,7 +261,7 @@ curDisplay = currentDisplay;
                 mPageRender = new SinglePageRender(getContext(),
                         mPageFlip,
                         mHandler,
-                        pageNo,textContent,curDisplay);
+                        pageNo,textContent,curDisplay,textToSpeech);
             }
 
             // let page render handle surface change
