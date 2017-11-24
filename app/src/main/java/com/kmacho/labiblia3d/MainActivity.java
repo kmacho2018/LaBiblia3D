@@ -1,14 +1,13 @@
 package com.kmacho.labiblia3d;
 
-import android.app.ActionBar;
+import android.arch.persistence.room.Room;
 import android.content.Intent;
 import android.graphics.Color;
+import android.media.Image;
+import android.os.AsyncTask;
 import android.os.Bundle;
-import android.support.design.internal.NavigationMenu;
+import android.os.Handler;
 import android.support.design.widget.FloatingActionButton;
-import android.support.design.widget.Snackbar;
-import android.support.v7.app.AlertDialog;
-import android.view.Gravity;
 import android.view.View;
 import android.support.design.widget.NavigationView;
 import android.support.v4.view.GravityCompat;
@@ -20,16 +19,19 @@ import android.view.Menu;
 import android.view.MenuItem;
 import android.widget.Button;
 import android.widget.CompoundButton;
+import android.widget.ImageView;
 import android.widget.LinearLayout;
 import android.widget.ScrollView;
 import android.widget.Switch;
-import android.widget.TextView;
 import android.widget.Toast;
 
 import com.google.android.gms.ads.AdListener;
 import com.google.android.gms.ads.AdRequest;
 import com.google.android.gms.ads.AdView;
 import com.google.android.gms.ads.InterstitialAd;
+import com.kmacho.labiblia3d.db.Configuration;
+import com.kmacho.labiblia3d.db.HolyBibleDatabase;
+import com.tapadoo.alerter.Alerter;
 
 public class MainActivity extends AppCompatActivity
         implements NavigationView.OnNavigationItemSelectedListener {
@@ -37,26 +39,31 @@ public class MainActivity extends AppCompatActivity
     public String activityTitle;
     private InterstitialAd mInterstitialAd;
     Switch speechCheck;
-
+    private HolyBibleDatabase holyBibleDatabase;
+    int configurationId = 1;
+    ImageView imageView;
+    Boolean speechCheckIsChecked = false;
+    Boolean isFirstLoad = true;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
 
+        holyBibleDatabase = Room.databaseBuilder(getApplicationContext(),
+                HolyBibleDatabase.class, "holyBible-db").fallbackToDestructiveMigration().build();
 
         // Create the InterstitialAd and set the adUnitId (defined in values/strings.xml).
         mInterstitialAd = newInterstitialAd();
-        //loadInterstitial();
+        loadInterstitial();
         // Load an ad into the AdMob banner view.
         AdView adView = (AdView) findViewById(R.id.adView);
         AdRequest adRequest = new AdRequest.Builder()
                 .setRequestAgent("android_studio:ad_template").build();
-        //adView.loadAd(adRequest);
+        adView.loadAd(adRequest);
 
         Toolbar toolbar = (Toolbar) findViewById(R.id.toolbar);
         setSupportActionBar(toolbar);
-
 
 
         FloatingActionButton fabNext = (FloatingActionButton) findViewById(R.id.fabNext);
@@ -127,7 +134,6 @@ public class MainActivity extends AppCompatActivity
                         break;
                     case "Salmos":
                         generateChapters("Proverbios");
-
                         break;
                     case "Proverbios":
                         generateChapters("Eclesiastés");
@@ -502,22 +508,72 @@ public class MainActivity extends AppCompatActivity
         NavigationView navigationView = (NavigationView) findViewById(R.id.nav_view);
         navigationView.setNavigationItemSelectedListener(this);
 
+        runOnUiThread(new Runnable() {
+            @Override
+            public void run() {
+                new Thread(new Runnable() {
+                    @Override
+                    public void run() {
+                        Configuration configuration = holyBibleDatabase.daoAccess().getConfigurationById(configurationId);
+                        if (configuration != null) {
+                            speechCheckIsChecked = configuration.getSpeech();
+                        }
+                        new Thread() {
+                            public void run() {
+                                runOnUiThread(new Runnable() {
+                                    public void run() {
+                                        speechCheck.setChecked(speechCheckIsChecked);
+                                    }
+                                });
+                            }
+                        }.start();
+                    }
+                }).start();
+            }
+        });
 
-        LinearLayout linear  = (LinearLayout) navigationView.getHeaderView(0);
-        LinearLayout linear2  = (LinearLayout) linear.getChildAt(0);
 
-        speechCheck =  (Switch)linear2.getChildAt(1);
+        LinearLayout linear = (LinearLayout) navigationView.getHeaderView(0);
+
+        LinearLayout linear2 = (LinearLayout) linear.getChildAt(0);
+
+
+        speechCheck = (Switch) linear2.getChildAt(1);
         speechCheck.setOnCheckedChangeListener(new CompoundButton.OnCheckedChangeListener() {
             @Override
             public void onCheckedChanged(CompoundButton compoundButton, boolean b) {
-                Toast.makeText(MainActivity.this, String.valueOf(b), Toast.LENGTH_SHORT).show();
+                new Thread(new Runnable() {
+                    @Override
+                    public void run() {
+                        new DatabaseAsync().doInBackground();
+
+                        if (!isFirstLoad) {
+                            String title = "Configuración";
+                            String text = "";
+                            int color = Color.BLUE;
+                            if (speechCheck.isChecked()) {
+                                color = Color.parseColor("#00308F");
+                                text = "Se ha activado la opción de narrar.";
+                            } else {
+                                color = Color.GRAY;
+                                text = "Se ha desactivado la opción de narrar.";
+                            }
+                            Alerter.create(MainActivity.this)
+                                    .setTitle(title)
+                                    .setText(text)
+                                    .setBackgroundColorInt(color) // or setBackgroundColorInt(Color.CYAN)
+                                    .show();
+                        }
+                        isFirstLoad = false;
+                    }
+                }).start();
             }
         });
 
         generateChapters("Génesis");
 
-
     }
+
 
     private InterstitialAd newInterstitialAd() {
         InterstitialAd interstitialAd = new InterstitialAd(this);
@@ -585,8 +641,11 @@ public class MainActivity extends AppCompatActivity
 
         //noinspection SimplifiableIfStatement
         if (id == R.id.action_settings) {
-            Toast.makeText(this, "No Disponible", Toast.LENGTH_LONG).show();
-
+            Intent i=new Intent(android.content.Intent.ACTION_SEND);
+            i.setType("text/plain");
+            i.putExtra(android.content.Intent.EXTRA_SUBJECT,"La biblia 3D");
+            i.putExtra(android.content.Intent.EXTRA_TEXT, "https://play.google.com/store/apps/details?id=com.kmacho.labiblia3d");
+            startActivity(Intent.createChooser(i,"Share via"));
             return true;
         }
 
@@ -834,7 +893,6 @@ public class MainActivity extends AppCompatActivity
                 .replace("1 Pedro", "Pedro1").replace("2 Pedro", "Pedro2")
                 .replace("1 Juan", "Juan1").replace("2 Juan", "Juan2").replace("3 Juan", "Juan3");
     }
-
 
     public void setActivityTitle(String title) {
         activityTitle = title;
@@ -1160,7 +1218,7 @@ public class MainActivity extends AppCompatActivity
                         } else {
                             Intent myIntent = new Intent(MainActivity.this, BibleActivity.class);
                             myIntent.putExtra("key", formatChapterName(book + "_" + finalI)); //Optional parameters
-                            myIntent.putExtra("speech",String.valueOf(speechCheck.isChecked()));
+                            myIntent.putExtra("speech", String.valueOf(speechCheck.isChecked()));
                             MainActivity.this.startActivity(myIntent);
                         }
                     }
@@ -1172,5 +1230,43 @@ public class MainActivity extends AppCompatActivity
         scrollview1.setScrollY(0);
     }
 
+    private class DatabaseAsync extends AsyncTask<Void, Void, Void> {
+
+        public Boolean synchronizeSpeech() {
+            Configuration configuration = holyBibleDatabase.daoAccess().getConfigurationById(configurationId);
+            return configuration.getSpeech();
+        }
+
+        @Override
+        protected void onPreExecute() {
+            super.onPreExecute();
+
+            //Perform pre-adding operation here.
+        }
+
+        @Override
+        protected Void doInBackground(Void... voids) {
+
+            Configuration configuration = holyBibleDatabase.daoAccess().getConfigurationById(configurationId);
+            if (configuration == null) {
+                configuration = new Configuration();
+                configuration.setConfigurationId(configurationId);
+                configuration.setSpeech(speechCheck.isChecked());
+                holyBibleDatabase.daoAccess().insertConfiguration(configuration);
+            } else {
+                configuration.setSpeech(speechCheck.isChecked());
+                holyBibleDatabase.daoAccess().updateConfiguration(configuration);
+            }
+
+            return null;
+        }
+
+        @Override
+        protected void onPostExecute(Void aVoid) {
+            super.onPostExecute(aVoid);
+
+            //To after addition operation here.
+        }
+    }
 
 }
