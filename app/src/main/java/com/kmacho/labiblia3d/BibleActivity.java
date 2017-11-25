@@ -2,6 +2,7 @@ package com.kmacho.labiblia3d;
 
 import android.annotation.SuppressLint;
 import android.app.Activity;
+import android.arch.persistence.room.Room;
 import android.content.Intent;
 import android.content.SharedPreferences;
 import android.content.pm.ActivityInfo;
@@ -28,6 +29,8 @@ import android.widget.Toast;
 import com.google.android.gms.ads.AdListener;
 import com.google.android.gms.ads.AdRequest;
 import com.google.android.gms.ads.InterstitialAd;
+import com.kmacho.labiblia3d.db.BookMark;
+import com.kmacho.labiblia3d.db.HolyBibleDatabase;
 
 import java.util.ArrayList;
 import java.util.HashMap;
@@ -43,16 +46,11 @@ public class BibleActivity extends Activity implements GestureDetector.OnGesture
     TextToSpeech textToSpeech1;
     int MY_DATA_CHECK_CODE = 1000;
     boolean speechEnable;
-
+    private HolyBibleDatabase holyBibleDatabase;
     private InterstitialAd mInterstitialAd;
+    String chapter;
+    Integer lastPage;
 
-
-    @Override
-    public void onDestroy() {
-        textToSpeech1.stop();
-        super.onDestroy();
-
-    }
 
     private int getStringResourceByName(String aString) {
         String packageName = getPackageName();
@@ -68,6 +66,9 @@ public class BibleActivity extends Activity implements GestureDetector.OnGesture
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
 
+        holyBibleDatabase = Room.databaseBuilder(getApplicationContext(),
+                HolyBibleDatabase.class, "holyBible-db").fallbackToDestructiveMigration().build();
+
         Intent intent2 = new Intent();
         intent2.setAction(TextToSpeech.Engine.ACTION_CHECK_TTS_DATA);
         startActivityForResult(intent2, MY_DATA_CHECK_CODE);
@@ -75,6 +76,20 @@ public class BibleActivity extends Activity implements GestureDetector.OnGesture
         Intent intent = getIntent();
 
         speechEnable = Boolean.valueOf(intent.getStringExtra("speech"));
+
+        chapter = intent.getStringExtra("key");
+
+        new Thread(new Runnable() {
+            @Override
+            public void run() {
+                BookMark bookMark = holyBibleDatabase.daoAccess().getBookMarkById(chapter);
+                if (bookMark == null) {
+                    lastPage = 1;
+                } else {
+                    lastPage = bookMark.getLastPage();
+                }
+            }
+        }).start();
     }
 
 
@@ -100,16 +115,39 @@ public class BibleActivity extends Activity implements GestureDetector.OnGesture
         return interstitialAd;
     }
 
+
+
+    @Override
+    protected void onDestroy() {
+
+        //Close the Text to Speech Library
+        if(textToSpeech1 != null) {
+
+            textToSpeech1.stop();
+            textToSpeech1.shutdown();
+        }
+        super.onDestroy();
+    }
+
     @Override
     protected void onActivityResult(int requestCode, int resultCode, Intent data) {
 
         if (requestCode == MY_DATA_CHECK_CODE) {
             if (resultCode == TextToSpeech.Engine.CHECK_VOICE_DATA_PASS) {
 
-                textToSpeech1 = new TextToSpeech(this, this);
+                if (textToSpeech1 != null) {
+                    textToSpeech1.stop();
+                    textToSpeech1.shutdown();
+                }
+
+                try {
+                    textToSpeech1 = new TextToSpeech(this, this);
+                } catch (Exception ex) {
+                    Toast.makeText(this, ex.getMessage(), Toast.LENGTH_SHORT).show();
+                }
                 Intent intent = getIntent();
 
-                String id = intent.getStringExtra("key");
+                String chapterId = intent.getStringExtra("key");
 
 
                 // Create the InterstitialAd and set the adUnitId (defined in values/strings.xml).
@@ -117,10 +155,9 @@ public class BibleActivity extends Activity implements GestureDetector.OnGesture
                 loadInterstitial();
                 String texto = "";
 
-                mPageFlipView = new PageFlipView(this, getString(getStringResourceByName(id)), getWindowManager().getDefaultDisplay(), textToSpeech1,speechEnable);
+                mPageFlipView = new PageFlipView(this, getString(getStringResourceByName(chapterId)), getWindowManager().getDefaultDisplay(), textToSpeech1, speechEnable, chapterId, holyBibleDatabase);
 
                 this.setRequestedOrientation(ActivityInfo.SCREEN_ORIENTATION_PORTRAIT);
-
 
                 setContentView(mPageFlipView);
                 mGestureDetector = new GestureDetector(this, this);
@@ -355,7 +392,7 @@ public class BibleActivity extends Activity implements GestureDetector.OnGesture
                 }
 
 
-                List<String> ParrafosToShow = Pages.get(1);
+                List<String> ParrafosToShow = Pages.get(lastPage);
                 String parrafo = "";
                 if (ParrafosToShow != null) {
                     for (String parrafoToShow : ParrafosToShow) {
@@ -560,7 +597,6 @@ public class BibleActivity extends Activity implements GestureDetector.OnGesture
     @Override
     public void onBackPressed() {
         textToSpeech1.stop();
-
         super.onBackPressed();
         //codigo adicional
         this.finish();

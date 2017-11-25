@@ -10,8 +10,12 @@ import android.graphics.Rect;
 import android.os.Handler;
 import android.os.Message;
 import android.speech.tts.TextToSpeech;
+import android.support.annotation.Nullable;
 import android.view.Display;
+import android.widget.Toast;
 
+import com.kmacho.labiblia3d.db.BookMark;
+import com.kmacho.labiblia3d.db.HolyBibleDatabase;
 import com.kmacho.pageflip.Page;
 import com.kmacho.pageflip.PageFlip;
 import com.kmacho.pageflip.PageFlipState;
@@ -34,6 +38,9 @@ public class SinglePageRender extends PageRender {
     public static Display cDisplay;
     public static TextToSpeech textToSpeech;
     public static Boolean speechEnable;
+    public static String chapter;
+    public static HolyBibleDatabase holyBibleDatabase;
+    public static Integer lastPage;
 
     /**
      * Constructor
@@ -41,13 +48,30 @@ public class SinglePageRender extends PageRender {
      * @see {@link #PageRender(Context, PageFlip, Handler, int)}
      */
     public SinglePageRender(Context context, PageFlip pageFlip,
-                            Handler handler, int pageNo, String text, Display currentDisplay, TextToSpeech textToSpeech1, Boolean speech_Enable) {
+                            Handler handler, int pageNo, String text, Display currentDisplay, TextToSpeech textToSpeech1, Boolean speech_Enable, String chapterId, HolyBibleDatabase holyBibleDB) {
 
 
-        super(context, pageFlip, handler, pageNo, getPagesCount(text, currentDisplay, textToSpeech1, speech_Enable));
+        super(context, pageFlip, handler, pageNo, getPagesCount(text, currentDisplay, textToSpeech1, speech_Enable, chapterId, holyBibleDB));
     }
 
-    public static int getPagesCount(String text, Display currentDisplay, TextToSpeech textToSpeech1, Boolean speech_Enable) {
+    public static int getPagesCount(String text, Display currentDisplay, TextToSpeech textToSpeech1, Boolean speech_Enable, final String chapterId, HolyBibleDatabase holyBibleDB) {
+
+        holyBibleDatabase = holyBibleDB;
+
+        new Thread(new Runnable() {
+            @Override
+            public void run() {
+                BookMark bookMark = holyBibleDatabase.daoAccess().getBookMarkById(chapterId);
+                if (bookMark != null) {
+                    lastPage = bookMark.getLastPage();
+                } else {
+                    lastPage = 1;
+                }
+            }
+        }).start();
+
+
+        chapter = chapterId;
 
         textToSpeech = textToSpeech1;
 
@@ -492,8 +516,29 @@ public class SinglePageRender extends PageRender {
 
         /*****************************************************************************************************************/
 
+        String valor = chapter;
+
+        if (lastPage != null) {
+            number = lastPage;
+            mPageNo = lastPage;
+            lastPage = null;
+        }
+
+        BookMark bookMark = holyBibleDatabase.daoAccess().getBookMarkById(chapter);
+        if (bookMark == null) {
+            bookMark = new BookMark();
+            bookMark.setLastPage(number);
+            bookMark.setChapterId(chapter);
+            holyBibleDatabase.daoAccess().insertBookMark(bookMark);
+        } else {
+            bookMark.setLastPage(number);
+            holyBibleDatabase.daoAccess().updateBookMark(bookMark);
+        }
+
 
         List<String> ParrafosToShow = Pages.get(number);
+
+
         String parrafo = "";
         if (ParrafosToShow != null) {
 

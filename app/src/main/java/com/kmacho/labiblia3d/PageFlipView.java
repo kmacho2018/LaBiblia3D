@@ -11,6 +11,7 @@ import android.util.Log;
 import android.view.Display;
 
 
+import com.kmacho.labiblia3d.db.HolyBibleDatabase;
 import com.kmacho.pageflip.PageFlip;
 import com.kmacho.pageflip.PageFlipException;
 
@@ -34,21 +35,26 @@ public class PageFlipView extends GLSurfaceView implements GLSurfaceView.Rendere
     PageRender mPageRender;
     ReentrantLock mDrawLock;
     Display curDisplay;
-String textContent = "";
-     TextToSpeech textToSpeech;
-     Boolean speechEnable;
+    String textContent = "";
+    TextToSpeech textToSpeech;
+    Boolean speechEnable;
+    String chapter;
+    HolyBibleDatabase holyBibleDatabase;
 
 
-    public PageFlipView(Context context,String texto,Display currentDisplay,TextToSpeech textToSpeech1,Boolean speech_Enable) {
+    public PageFlipView(Context context, String texto, Display currentDisplay, TextToSpeech textToSpeech1, Boolean speech_Enable, String chapter_id,HolyBibleDatabase holyBibleDB) {
         super(context);
 
+        holyBibleDatabase =  holyBibleDB;
+
+        chapter = chapter_id;
         textToSpeech = textToSpeech1;
 
         // create handler to tackle message
         newHandler();
 
         textContent = texto;
-curDisplay = currentDisplay;
+        curDisplay = currentDisplay;
 
         // load preferences
         SharedPreferences pref = PreferenceManager
@@ -67,12 +73,11 @@ curDisplay = currentDisplay;
         setEGLContextClientVersion(2);
 
 
-
         // init others
         mPageNo = 1;
         mDrawLock = new ReentrantLock();
         mPageRender = new SinglePageRender(context, mPageFlip,
-                mHandler, mPageNo,textContent,currentDisplay,textToSpeech1,speech_Enable);
+                mHandler, mPageNo, textContent, currentDisplay, textToSpeech1, speech_Enable,chapter_id,holyBibleDatabase);
         // configure render
         setRenderer(this);
         setRenderMode(GLSurfaceView.RENDERMODE_WHEN_DIRTY);
@@ -92,7 +97,7 @@ curDisplay = currentDisplay;
      *
      * @param enable true is enable
      */
-    public void enableAutoPage(boolean enable,Display currentDiplay) {
+    public void enableAutoPage(boolean enable, Display currentDiplay) {
         if (mPageFlip.enableAutoPage(enable)) {
             try {
                 mDrawLock.lock();
@@ -104,19 +109,17 @@ curDisplay = currentDisplay;
                             mPageNo);
                     mPageRender.onSurfaceChanged(mPageFlip.getSurfaceWidth(),
                             mPageFlip.getSurfaceHeight());
-                }
-                else if (mPageFlip.getSecondPage() == null &&
+                } else if (mPageFlip.getSecondPage() == null &&
                         mPageRender instanceof DoublePagesRender) {
                     mPageRender = new SinglePageRender(getContext(),
                             mPageFlip,
                             mHandler,
-                            mPageNo,textContent,currentDiplay,textToSpeech,speechEnable);
+                            mPageNo, textContent, currentDiplay, textToSpeech, speechEnable,chapter,holyBibleDatabase);
                     mPageRender.onSurfaceChanged(mPageFlip.getSurfaceWidth(),
                             mPageFlip.getSurfaceHeight());
                 }
                 requestRender();
-            }
-            finally {
+            } finally {
                 mDrawLock.unlock();
             }
         }
@@ -173,8 +176,7 @@ curDisplay = currentDisplay;
     public void onFingerMove(float x, float y) {
         if (mPageFlip.isAnimating()) {
             // nothing to do during animating
-        }
-        else if (mPageFlip.canAnimate(x, y)) {
+        } else if (mPageFlip.canAnimate(x, y)) {
             // if the point is out of current page, try to start animating
             onFingerUp(x, y);
         }
@@ -186,8 +188,7 @@ curDisplay = currentDisplay;
                         mPageRender.onFingerMove(x, y)) {
                     requestRender();
                 }
-            }
-            finally {
+            } finally {
                 mDrawLock.unlock();
             }
         }
@@ -208,8 +209,7 @@ curDisplay = currentDisplay;
                         mPageRender.onFingerUp(x, y)) {
                     requestRender();
                 }
-            }
-            finally {
+            } finally {
                 mDrawLock.unlock();
             }
         }
@@ -227,8 +227,7 @@ curDisplay = currentDisplay;
             if (mPageRender != null) {
                 mPageRender.onDrawFrame();
             }
-        }
-        finally {
+        } finally {
             mDrawLock.unlock();
         }
     }
@@ -236,8 +235,8 @@ curDisplay = currentDisplay;
     /**
      * Handle surface is changed
      *
-     * @param gl OpenGL handle
-     * @param width new width of surface
+     * @param gl     OpenGL handle
+     * @param width  new width of surface
      * @param height new height of surface
      */
     @Override
@@ -257,18 +256,17 @@ curDisplay = currentDisplay;
                 }
             }
             // if there is only one page, create single page render when need
-            else if(!(mPageRender instanceof SinglePageRender)) {
+            else if (!(mPageRender instanceof SinglePageRender)) {
                 mPageRender.release();
                 mPageRender = new SinglePageRender(getContext(),
                         mPageFlip,
                         mHandler,
-                        pageNo,textContent,curDisplay,textToSpeech,speechEnable);
+                        pageNo, textContent, curDisplay, textToSpeech, speechEnable,chapter,holyBibleDatabase);
             }
 
             // let page render handle surface change
             mPageRender.onSurfaceChanged(width, height);
-        }
-        catch (PageFlipException e) {
+        } catch (PageFlipException e) {
             Log.e(TAG, "Failed to run PageFlipFlipRender:onSurfaceChanged");
         }
     }
@@ -276,15 +274,14 @@ curDisplay = currentDisplay;
     /**
      * Handle surface is created
      *
-     * @param gl OpenGL handle
+     * @param gl     OpenGL handle
      * @param config EGLConfig object
      */
     @Override
     public void onSurfaceCreated(GL10 gl, EGLConfig config) {
         try {
             mPageFlip.onSurfaceCreated();
-        }
-        catch (PageFlipException e) {
+        } catch (PageFlipException e) {
             Log.e(TAG, "Failed to run PageFlipFlipRender:onSurfaceCreated");
         }
     }
@@ -308,8 +305,7 @@ curDisplay = currentDisplay;
                                     mPageRender.onEndedDrawing(msg.arg1)) {
                                 requestRender();
                             }
-                        }
-                        finally {
+                        } finally {
                             mDrawLock.unlock();
                         }
                         break;
